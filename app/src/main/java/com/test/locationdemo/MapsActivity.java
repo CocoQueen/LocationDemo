@@ -29,9 +29,16 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivity extends AppCompatActivity
         implements GoogleMap.OnMyLocationButtonClickListener,
@@ -103,9 +110,66 @@ public class MapsActivity extends AppCompatActivity
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMarkerDragListener(this);
         enableMyLocation();
+        mMap.addPolyline(new PolylineOptions().addAll(readLatLngs()).width(2)//设置线宽
+                .geodesic(false) //是否是大地曲线
+                .color(getResources().getColor(R.color.black)));
+
+        BitmapDescriptor startDescriptor = BitmapDescriptorFactory.fromResource(R.mipmap.map_start);
+        BitmapDescriptor ednDescriptor = BitmapDescriptorFactory.fromResource(R.mipmap.map_end);
+        mMap.addMarker((new MarkerOptions()).position(readLatLngs().get(0)).icon(startDescriptor));
+        mMap.addMarker((new MarkerOptions()).position(readLatLngs().get(readLatLngs().size() - 1)).icon(ednDescriptor));
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(new LatLng(readLatLngs().get(0).latitude, readLatLngs().get(0).longitude)).zoom(15).build();
+        mMap.animateCamera(CameraUpdateFactory
+                .newCameraPosition(cameraPosition));
 
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private double[] coords = {37.85859603831572, 112.49881265978634,
+            37.858621450453285, 112.49891994813964, 37.85863658891602, 112.49923665178488,
+            37.85894153382089, 112.49931175363218, 37.8592041242558, 112.49933321130284, 37.859576831653975, 112.49940831315014,
+            37.859932596048694, 112.49947268616212, 37.86029682924524, 112.4995370591741, 37.86064411968655, 112.49960143218608,
+            37.860915174503745, 112.49964434752741, 37.86101681980319, 112.49981600889267,37.86096599717097, 112.50024516230584,
+            37.86088976315696, 112.50071723106035, 37.86077117675623, 112.501779385758, 37.86065259016469, 112.50302393065623,
+            37.86055094436294, 112.5040968141892, 37.86045776893343, 112.50500876573533, 37.86026294717527, 112.50621039529226,
+            37.86007659544648, 112.50727254998988, 37.85987330211409, 112.50863511207672, 37.859771655237616, 112.5093861305498,
+            37.85966153762991, 112.51046974291809,37.85959377286647, 112.51104910002589, 37.85952600804074, 112.51152116878039,
+            37.859373536955054, 112.51160699946304, 37.85905165251616, 112.51158554179236};
+
+    private List<LatLng> readLatLngs() {
+        List<LatLng> points = new ArrayList<>();
+        for (int i = 0; i < coords.length; i += 2) {
+//            LatLng latLng = TransBaiduGaodePoint.baidu_to_gaode(new LatLng(coords[i], coords[i+1]));
+            points.add(new LatLng(coords[i], coords[i+1]));
+        }
+        return points;
+    }
     /**
      * 检查是否已经连接到 Google Play services
      */
