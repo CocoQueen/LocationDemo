@@ -58,11 +58,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void enableMyLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // Permission to access the location is missing.
             PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST_CODE,
                     Manifest.permission.ACCESS_FINE_LOCATION, true);
         } else if (mGoogleMap != null) {
-            // Access to the location has been granted to the app.
             mGoogleMap.setMyLocationEnabled(true);
         }
     }
@@ -70,7 +68,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onPause() {
         super.onPause();
-        //Unregister for location callbacks:
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
@@ -145,13 +142,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(this, "onConnectionFailed", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            Log.e("============", "onLocationChanged: "+location.getLongitude()+"---"+location.getLatitude() );
             mGoogleMap.clear();
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -160,18 +155,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             mGoogleMap.animateCamera(CameraUpdateFactory
                     .newCameraPosition(cameraPosition));
 
-            // create markerOptions
             MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(
                     location.getLatitude(), location.getLongitude()));
-            // ROSE color icon
             markerOptions.icon(BitmapDescriptorFactory
                     .defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
             markerOptions.position(latLng);
-            // adding markerOptions
             Marker marker = mGoogleMap.addMarker(markerOptions);
         }
-
-        //remove previous current location marker and add new one at current position
         if (mCurrLocation != null) {
             mCurrLocation.remove();
         }
@@ -183,9 +173,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mCurrLocation = mGoogleMap.addMarker(markerOptions);
 
         Toast.makeText(this, "Location Changed", Toast.LENGTH_SHORT).show();
-
-        //If you only need one location, unregister the listener
-        //LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
 
 }

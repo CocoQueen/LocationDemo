@@ -70,10 +70,7 @@ public class MapsActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
-        //接收FetchAddressIntentService返回的结果
         mResultReceiver = new AddressResultReceiver(new Handler());
-        //创建GoogleAPIClient实例
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -81,7 +78,6 @@ public class MapsActivity extends AppCompatActivity
                     .addApi(LocationServices.API)
                     .build();
         }
-        //取得SupportMapFragment,并在地图准备好后调用onMapReady
         Button btn=findViewById(R.id.btn);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -93,7 +89,6 @@ public class MapsActivity extends AppCompatActivity
                     mMap.snapshot(new GoogleMap.SnapshotReadyCallback() {
                         @Override
                         public void onSnapshotReady(@Nullable Bitmap bitmap) {
-                            Log.e("=====", "onSnapshotReady: "+bitmap );
                         }
                     });
 
@@ -125,42 +120,32 @@ public class MapsActivity extends AppCompatActivity
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     private double[] coords = {37.85859603831572, 112.49881265978634,
-            37.858621450453285, 112.49891994813964, 37.85863658891602, 112.49923665178488,
-            37.85894153382089, 112.49931175363218, 37.8592041242558, 112.49933321130284, 37.859576831653975, 112.49940831315014,
-            37.859932596048694, 112.49947268616212, 37.86029682924524, 112.4995370591741, 37.86064411968655, 112.49960143218608,
-            37.860915174503745, 112.49964434752741, 37.86101681980319, 112.49981600889267,37.86096599717097, 112.50024516230584,
-            37.86088976315696, 112.50071723106035, 37.86077117675623, 112.501779385758, 37.86065259016469, 112.50302393065623,
-            37.86055094436294, 112.5040968141892, 37.86045776893343, 112.50500876573533, 37.86026294717527, 112.50621039529226,
-            37.86007659544648, 112.50727254998988, 37.85987330211409, 112.50863511207672, 37.859771655237616, 112.5093861305498,
-            37.85966153762991, 112.51046974291809,37.85959377286647, 112.51104910002589, 37.85952600804074, 112.51152116878039,
-            37.859373536955054, 112.51160699946304, 37.85905165251616, 112.51158554179236};
+            37.858621450453285, 112.49891994813964,
+            37.85863658891602, 112.49923665178488,
+            37.85894153382089, 112.49931175363218,
+            37.8592041242558, 112.49933321130284,
+            37.859576831653975, 112.49940831315014,
+            37.859932596048694, 112.49947268616212,
+            37.86029682924524, 112.4995370591741,
+            37.86064411968655, 112.49960143218608,
+            37.860915174503745, 112.49964434752741,
+            37.86101681980319, 112.49981600889267,
+            37.86096599717097, 112.50024516230584,
+            37.86088976315696, 112.50071723106035,
+            37.86077117675623, 112.501779385758,
+            37.86065259016469, 112.50302393065623,
+            37.86055094436294, 112.5040968141892,
+            37.86045776893343, 112.50500876573533,
+            37.86026294717527, 112.50621039529226,
+            37.86007659544648, 112.50727254998988,
+            37.85987330211409, 112.50863511207672,
+            37.859771655237616, 112.5093861305498,
+            37.85966153762991, 112.51046974291809,
+            37.85959377286647, 112.51104910002589,
+            37.85952600804074, 112.51152116878039,
+            37.859373536955054, 112.51160699946304,
+            37.85905165251616, 112.51158554179236};
 
     private List<LatLng> readLatLngs() {
         List<LatLng> points = new ArrayList<>();
@@ -174,7 +159,6 @@ public class MapsActivity extends AppCompatActivity
      * 检查是否已经连接到 Google Play services
      */
     private void checkIsGooglePlayConn() {
-        Log.i("MapsActivity", "checkIsGooglePlayConn-->" + mGoogleApiClient.isConnected());
         if (mGoogleApiClient.isConnected() && mLastLocation != null) {
             startIntentService(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
         }
@@ -187,11 +171,9 @@ public class MapsActivity extends AppCompatActivity
     private void enableMyLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // Permission to access the location is missing.
             PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST_CODE,
                     Manifest.permission.ACCESS_FINE_LOCATION, true);
         } else if (mMap != null) {
-            // Access to the location has been granted to the app.
             mMap.setMyLocationEnabled(true);
         }
     }
@@ -204,13 +186,6 @@ public class MapsActivity extends AppCompatActivity
      */
     @Override
     public boolean onMyLocationButtonClick() {
-        Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
-        // Return false so that we don't consume the event and the default behavior still occurs
-        // (the camera animates to the user's current position).
-        if (mLastLocation != null) {
-            Log.i("MapsActivity", "Latitude-->" + String.valueOf(mLastLocation.getLatitude()));
-            Log.i("MapsActivity", "Longitude-->" + String.valueOf(mLastLocation.getLongitude()));
-        }
         if (lastLatLng != null)
             perth.setPosition(lastLatLng);
         checkIsGooglePlayConn();
@@ -236,11 +211,7 @@ public class MapsActivity extends AppCompatActivity
         }
         if (PermissionUtils.isPermissionGranted(permissions, grantResults,
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
-            // Enable the my location layer if the permission has been granted.
             enableMyLocation();
-        } else {
-            // Display the missing permission error dialog when the fragments resume.
-            mPermissionDenied = true;
         }
     }
 
@@ -248,7 +219,6 @@ public class MapsActivity extends AppCompatActivity
     protected void onResumeFragments() {
         super.onResumeFragments();
         if (mPermissionDenied) {
-            // Permission was not granted, display error dialog.
             showMissingPermissionError();
             mPermissionDenied = false;
         }
@@ -261,7 +231,6 @@ public class MapsActivity extends AppCompatActivity
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.i("MapsActivity", "--onConnected--");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(getApplicationContext(), "Permission to access the location is missing.", Toast.LENGTH_LONG).show();
@@ -363,8 +332,6 @@ public class MapsActivity extends AppCompatActivity
 
             mAddressOutput = resultData.getString(FetchAddressIntentService.RESULT_DATA_KEY);
             if (resultCode == FetchAddressIntentService.SUCCESS_RESULT) {
-                Log.i("MapsActivity", "mAddressOutput-->" + mAddressOutput);
-
                 new AlertDialog.Builder(MapsActivity.this)
                         .setTitle("Position")
                         .setMessage(mAddressOutput)
