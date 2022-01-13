@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -54,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         buildGoogleApiClient();
         mGoogleApiClient.connect();
     }
-
     private void enableMyLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     protected synchronized void buildGoogleApiClient() {
-        Toast.makeText(this, "buildGoogleApiClient", Toast.LENGTH_SHORT).show();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -84,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onConnected(Bundle bundle) {
-        Toast.makeText(this, "onConnected", Toast.LENGTH_SHORT).show();
         Connected();
     }
 
@@ -96,21 +94,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Manifest.permission.ACCESS_FINE_LOCATION, true);
         } else if (mGoogleMap != null) {
             // Access to the location has been granted to the app.
-            Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            if (mLastLocation != null) {
-                //place marker at current position
-                mGoogleMap.clear();
-                latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(latLng);
-                markerOptions.title("Current Position");
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-                mCurrLocation = mGoogleMap.addMarker(markerOptions);
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())).zoom(15).build();
-                mGoogleMap.animateCamera(CameraUpdateFactory
-                        .newCameraPosition(cameraPosition));
-            }
             mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(5000); //5 seconds
             mLocationRequest.setFastestInterval(3000); //3 seconds
@@ -129,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (PermissionUtils.isPermissionGranted(permissions, grantResults,
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
             enableMyLocation();
-            Connected();
+            buildGoogleApiClient();
         } else {
 //            mPermissionDenied = true;
         }
@@ -146,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.e("TAG", "onLocationChanged: "+new Gson().toJson(location));
         if (location != null) {
             mGoogleMap.clear();
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -161,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
             markerOptions.position(latLng);
             Marker marker = mGoogleMap.addMarker(markerOptions);
+            Log.e("TAG", "onLocationChanged: "+new Gson().toJson(latLng) );
         }
         if (mCurrLocation != null) {
             mCurrLocation.remove();
